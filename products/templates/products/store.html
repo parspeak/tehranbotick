@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load partials %}
+
+{% block title %}
+    تهران بوتیک - فروشگاه
+{% endblock %}
+
+{% block content %}
+    <div class="container flex gap-8 my-4">
+        <div class="w-3/12 border rounded-lg p-4 h-fit sticky top-4 hidden xl:block">
+            <div class="flex items-center justify-between">
+                <h3 class="font-bold">فیلتر ها</h3>
+            </div>
+            <div class="join join-vertical w-full mt-4">
+                <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                    <input type="checkbox" name="price-filter"/>
+                    <div class="collapse-title text-sm font-bold">محدوده قیمت</div>
+                    <div class="collapse-content">
+                        <div x-data="range()" x-init="mintrigger(); maxtrigger()" class="relative max-w-xl w-full"
+                             dir="ltr">
+                            <div>
+                                <input type="range" step="100" x-bind:min="min" x-bind:max="max"
+                                       x-on:input="mintrigger" x-model="minprice"
+                                       class="absolute pointer-events-none appearance-none z-20 h-2 w-full opacity-0 cursor-pointer">
+
+                                <input type="range" step="100" x-bind:min="min" x-bind:max="max"
+                                       x-on:input="maxtrigger" x-model="maxprice"
+                                       class="absolute pointer-events-none appearance-none z-20 h-2 w-full opacity-0 cursor-pointer">
+
+                                <div class="relative z-10 h-2">
+
+                                    <div class="absolute z-10 left-0 right-0 bottom-0 top-0 rounded-md bg-gray-200">
+                                    </div>
+
+                                    <div class="absolute z-20 top-0 bottom-0 rounded-md bg-primary"
+                                         x-bind:style="'right:'+maxthumb+'%; left:'+minthumb+'%'"></div>
+
+                                    <div class="absolute z-30 w-6 h-6 top-0 left-0 bg-primary rounded-full -mt-2"
+                                         x-bind:style="'left: '+minthumb+'%'"></div>
+
+                                    <div class="absolute z-30 w-6 h-6 top-0 right-0 bg-primary rounded-full -mt-2"
+                                         x-bind:style="'right: '+maxthumb+'%'"></div>
+                                </div>
+                            </div>
+                            <form id="price-filter-form" hx-get="." hx-target="#product-list" hx-swap="outerHTML"
+                                  hx-replace-url="true"
+                                  hx-include="#price-filter-form, #color-filter-form, #instock-filter-form, #category-filter-form, #orderby-filter-form">
+                                <div class="flex items-center justify-between pt-5 space-x-4 text-sm text-gray-700">
+                                    <div>
+                                        {% render_field products.form.price__gt|attr:'@input.debounce:mintrigger' type="text" x-model="minprice" class="w-24 px-3 py-2 text-center border border-gray-200 rounded-lg bg-gray-50 focus:border-yellow-400 focus:outline-none" %}
+                                    </div>
+                                    <div>
+                                        {% render_field products.form.price__lt|attr:'@input.debounce:maxtrigger' type="text" x-model="maxprice" class="w-24 px-3 py-2 text-center border border-gray-200 rounded-lg bg-gray-50 focus:border-yellow-400 focus:outline-none" %}
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-primary mt-4 w-full">اعمال تغییرات</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                    <input type="checkbox" name="category-filter" />
+                    <div class="collapse-title text-sm font-bold">دسته بندی ها</div>
+                    <div class="collapse-content">
+                        <form id="category-filter-form" hx-get="." hx-target="#product-list" hx-swap="outerHTML" hx-replace-url="true" hx-trigger="change" hx-include="#price-filter-form, #color-filter-form, #instock-filter-form, #category-filter-form, #orderby-filter-form">
+                            {% render_field products.form.category class="select select-bordered w-full" %}
+                        </form>
+                    </div>
+                </div>
+                <div class="border-base-300 p-4">
+                    <form x-data="handleStatusFilter()" x-init="initState()" class="flex flex-col gap-4" id="instock-filter-form" hx-get="." hx-trigger="change"
+                          hx-target="#product-list" hx-swap="outerHTML" hx-replace-url="true"
+                          hx-include="#price-filter-form, #color-filter-form, #instock-filter-form, #category-filter-form, #orderby-filter-form">
+                        <div class="flex justify-between">
+                            <h4 class="text-sm font-bold">فقط کالا های موجود</h4>
+                            <input type="checkbox" class="toggle toggle-primary" value="in-stock" @click="handleClick($data, 'instock')">
+                        </div>
+                        <div class="flex justify-between">
+                            <h4 class="text-sm font-bold">محصولات تخفیف دار</h4>
+                            <input type="checkbox" class="toggle toggle-primary" value="onsale" @click="handleClick($data, 'onsale')">
+                        </div>
+                        {% render_field products.form.status class="hidden" x-model="status" %}
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="w-12/12 xl:w-9/12 px-4 xl:px-0">
+            <div class="hidden xl:block">
+                <form class="flex gap-8 mb-4" id="orderby-filter-form" hx-get="." hx-target="#product-list" hx-swap="outerHTML"
+                    hx-replace-url="true" hx-trigger="change"
+                    hx-include="#price-filter-form, #color-filter-form, #instock-filter-form, #category-filter-form, #orderby-filter-form">
+                    <label>
+                        <input type="radio" name="order_by" value="date" class="hidden" checked />
+                        <span class="font-bold text-sm pb-2 label-checked:border-b-2 label-checked:border-primary label-checked:text-primary cursor-pointer">جدیدترین ها</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="order_by" class="hidden" value="price-desc" />
+                        <span class="font-bold text-sm pb-2 label-checked:border-b-2 label-checked:border-primary label-checked:text-primary cursor-pointer">گرانترین ها</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="order_by" class="hidden" value="price" />
+                        <span class="font-bold text-sm pb-2 label-checked:border-b-2 label-checked:border-primary label-checked:text-primary cursor-pointer">ارزانترین ها</span>
+                    </label>
+                </form>
+            </div>
+            <div class="mb-4 flex gap-4 items-center xl:hidden">
+                <div>
+                    <button class="btn btn-ghost font-bold text-sm flex items-center" onclick="filterModal.showModal()">
+                        <img src="{% static 'images/icons/setting-5.svg' %}" alt="filter-icon">
+                        <span>
+                            فیلتر ها
+                        </span>
+                    </button>
+                    <dialog id="filterModal" class="modal bg-white">
+                        <div class="absolute top-0 left-0 right-0 p-4">
+                            <div class="flex mb-8 gap-2 items-center">
+                                <button onclick="filterModal.close()">
+                                    <img src="{% static 'images/icons/arrow-right.svg' %}" alt="arrow-right">
+                                </button>
+                                <div class="flex items-center justify-between w-full">
+                                    <h3 class="text-sm font-bold">فیلتر ها</h3>
+                                    <button class="btn btn-ghost font-bold text-primary btn-sm">حدف فیلترها</button>
+                                </div>
+                            </div>
+
+                            <div class="join join-vertical w-full mt-4">
+                                <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                                    <input type="checkbox" name="price-filter"/>
+                                    <div class="collapse-title text-sm font-bold">محدوده قیمت</div>
+                                    <div class="collapse-content">
+                                        <div x-data="range()" x-init="mintrigger(); maxtrigger()" class="relative max-w-xl w-full"
+                                             dir="ltr">
+                                            <div>
+                                                <input type="range" step="100" x-bind:min="min" x-bind:max="max"
+                                                       x-on:input="mintrigger" x-model="minprice"
+                                                       class="absolute pointer-events-none appearance-none z-20 h-2 w-full opacity-0 cursor-pointer">
+
+                                                <input type="range" step="100" x-bind:min="min" x-bind:max="max"
+                                                       x-on:input="maxtrigger" x-model="maxprice"
+                                                       class="absolute pointer-events-none appearance-none z-20 h-2 w-full opacity-0 cursor-pointer">
+
+                                                <div class="relative z-10 h-2">
+
+                                                    <div class="absolute z-10 left-0 right-0 bottom-0 top-0 rounded-md bg-gray-200">
+                                                    </div>
+
+                                                    <div class="absolute z-20 top-0 bottom-0 rounded-md bg-primary"
+                                                         x-bind:style="'right:'+maxthumb+'%; left:'+minthumb+'%'"></div>
+
+                                                    <div class="absolute z-30 w-6 h-6 top-0 left-0 bg-primary rounded-full -mt-2"
+                                                         x-bind:style="'left: '+minthumb+'%'"></div>
+
+                                                    <div class="absolute z-30 w-6 h-6 top-0 right-0 bg-primary rounded-full -mt-2"
+                                                         x-bind:style="'right: '+maxthumb+'%'"></div>
+                                                </div>
+                                            </div>
+                                            <form id="mobile-price-filter-form" hx-get="." hx-target="#product-list" hx-swap="outerHTML"
+                                                  hx-replace-url="true"
+                                                  hx-include="#mobile-price-filter-form, #mobile-color-filter-form, #mobile-instock-filter-form, #mobile-category-filter-form, #mobile-orderby-filter-form, #mobile-page-filter-form">
+                                                <div class="flex items-center justify-between pt-5 space-x-4 text-sm text-gray-700">
+                                                    <div>
+                                                        {% render_field products.form.price__gt|attr:'@input.debounce:mintrigger' type="text" x-model="minprice" class="w-24 px-3 py-2 text-center border border-gray-200 rounded-lg bg-gray-50 focus:border-yellow-400 focus:outline-none" %}
+                                                    </div>
+                                                    <div>
+                                                        {% render_field products.form.price__lt|attr:'@input.debounce:maxtrigger' type="text" x-model="maxprice" class="w-24 px-3 py-2 text-center border border-gray-200 rounded-lg bg-gray-50 focus:border-yellow-400 focus:outline-none" %}
+                                                    </div>
+                                                </div>
+
+                                                <button class="btn btn-primary mt-4 w-full">اعمال تغییرات</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="collapse collapse-arrow join-item border-base-300 border-b">
+                                    <input type="checkbox" name="category-filter" />
+                                    <div class="collapse-title text-sm font-bold">دسته بندی ها</div>
+                                    <div class="collapse-content">
+                                        <form id="mobile-category-filter-form" hx-get="." hx-target="#product-list" hx-swap="outerHTML" hx-replace-url="true" hx-trigger="change" hx-include="#mobile-price-filter-form, #mobile-color-filter-form, #mobile-instock-filter-form, #mobile-category-filter-form, #mobile-orderby-filter-form, #mobile-page-filter-form">
+                                            {% render_field products.form.category class="select select-bordered w-full" %}
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="border-base-300 p-4">
+                                    <form x-data="handleStatusFilter()" x-init="initState()" class="flex flex-col gap-4" id="mobile-instock-filter-form" hx-get="." hx-trigger="change"
+                                          hx-target="#product-list" hx-swap="outerHTML" hx-replace-url="true"
+                                          hx-include="#mobile-price-filter-form, #mobile-color-filter-form, #mobile-instock-filter-form, #mobile-category-filter-form, #mobile-orderby-filter-form, #mobile-page-filter-form">
+                                        <div class="flex justify-between">
+                                            <h4 class="text-sm font-bold">فقط کالا های موجود</h4>
+                                            <input type="checkbox" class="toggle toggle-primary" value="in-stock" @click="handleClick($data, 'instock')">
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <h4 class="text-sm font-bold">محصولات تخفیف دار</h4>
+                                            <input type="checkbox" class="toggle toggle-primary" value="onsale" @click="handleClick($data, 'onsale')">
+                                        </div>
+                                        {% render_field products.form.status class="hidden" x-model="status" %}
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </dialog>
+                </div>
+                <div class="dropdown dropdown-hover">
+                    <div tabindex="0" role="button" class="btn m-1 btn-ghost">
+                        <img src="{% static 'images/icons/sort.svg' %}" alt="sort-icon">
+                        <span>جدیدترین</span>
+                    </div>
+                    <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                        <li><a>ارزان ترین</a></li>
+                        <li><a>گران ترین</a></li>
+                    </ul>
+                </div>
+            </div>
+                {% partialdef product_list inline %}
+
+            <div id="product-list">
+                    <div class="grid grid-cols-12 gap-4">
+                    {% for product in page_obj.object_list %}
+                        <a class="border rounded-lg p-2 col-span-6 md:col-span-3 relative" href="{% url 'products:product-detail' product.id %}">
+                            {% if not product.in_stock %}
+                                <p class="absolute right-4 top-4 bg-primary p-2 rounded-xl text-sm z-10 text-white">ناموجود</p>
+                            {% endif %}
+                            <img class="object-cover max-h-72 w-full rounded-md {% if not product.in_stock %}grayscale{% endif %}" src="{{ product.thumbnail.image.url }}"
+                                 alt="{{ product.thumbnail.alt_text }}">
+                            <div class="mt-2">
+                                <h1 class="font-extrabold text-lg">{{ product.name }}</h1>
+                                <p class="text-sm font-bold mt-1">{{ product.summary }}</p>
+                                <p class="text-end font-extrabold">
+                                    {% if product.is_discounted %}
+                                        <del class="text-red-500 me-2">{{ product.get_price_text }}</del>
+                                        {{ product.get_discounted_price }}
+                                        {% else %}
+                                        {{ product.get_price_text }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </a>
+                    {% endfor %}
+                    </div>
+                <div class="mt-4 flex justify-center">
+                    <div class="border p-4 rounded-full">
+                        <form id="mobile-page-filter-form" hx-get="." hx-trigger="change"
+                              hx-target="#product-list" hx-swap="outerHTML" hx-replace-url="true"
+                              hx-include="#mobile-price-filter-form, #mobile-color-filter-form, #mobile-instock-filter-form, #mobile-category-filter-form, #mobile-orderby-filter-form, #mobile-page-filter-form">
+                            {% for page_number in page_obj.paginator.page_range %}
+                                <input
+                                    class="btn btn-outline min-w-12 btn-primary rounded-full"
+                                    type="radio"
+                                    name="page"
+                                    value="{{page_number}}"
+                                    aria-label={{page_number}}
+                                    {% if page_number == page_obj.number %}checked{% endif %}
+                                />
+                            {% endfor %}
+                        </form>
+                    </div>
+                </div>
+                {% endpartialdef %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_script %}
+    <!-- filter -->
+    <script>
+        function handleStatusFilter() {
+            return {
+                selectedStatus: null,
+                status: '',
+                handleClick: (data, status) => {
+                    if(!(this.selectedStatus.includes(status))) {
+                        this.selectedStatus.push(status)
+                    } else {
+                        this.selectedStatus = this.selectedStatus.filter(filter => filter !== status)
+                    }
+                    data.status = this.selectedStatus.join('-')
+                },
+                initState: () => {
+                    this.selectedStatus = []
+                    this.status = ''
+                }
+            }
+        }
+        function range() {
+            return {
+                minprice: {% if request.GET.price__gt %}{{ request.GET.price__gt }}{% else %}0{% endif %},
+                maxprice: {% if request.GET.price__lt %}{{ request.GET.price__lt }}{% else %}{{price__max}}{% endif %},
+                min: 0,
+                max: {{ price__max }},
+                minthumb: 0,
+                maxthumb: 0,
+                mintrigger() {
+                    this.validation();
+                    this.minprice = Math.min(this.minprice, this.maxprice - 500);
+                    this.minthumb = ((this.minprice - this.min) / (this.max - this.min)) * 100;
+                },
+                maxtrigger() {
+                    this.validation();
+                    this.maxprice = Math.max(this.maxprice, this.minprice + 200);
+                    this.maxthumb = 100 - (((this.maxprice - this.min) / (this.max - this.min)) * 100);
+                },
+                validation() {
+                    if (/^\d*$/.test(this.minprice)) {
+                        if (this.minprice > this.max) {
+                            this.minprice = 9500;
+                        }
+                        if (this.minprice < this.min) {
+                            this.minprice = this.min;
+                        }
+                    } else {
+                        this.minprice = 0;
+                    }
+                    if (/^\d*$/.test(this.maxprice)) {
+                        if (this.maxprice > this.max) {
+                            this.maxprice = this.max;
+                        }
+                        if (this.maxprice < this.min) {
+                            this.maxprice = 200;
+                        }
+                    } else {
+                        this.maxprice = 10000;
+                    }
+                }
+            }
+        }
+    </script>
+
+{% endblock %}

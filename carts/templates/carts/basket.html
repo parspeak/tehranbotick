@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load partials %}
+{% load widget_tweaks %}
+
+{% block title %}
+    سبد خرید
+{% endblock %}
+
+{% block content %}
+    {% partialdef basket inline %}
+        <div class="container px-4" id="basket">
+            <div class="justify-center my-8 hidden lg:flex">
+                <ul class="steps steps-vertical lg:steps-horizontal">
+                    <li class="step text-sm step-primary font-bold">سبد خرید</li>
+                    <li class="step text-sm font-bold">اطلاعات آدرس</li>
+                    <li class="step text-sm font-bold">پرداخت</li>
+                </ul>
+            </div>
+
+            <div class="lg:grid grid-cols-12 gap-10">
+                <div class="col-span-12 lg:col-span-8">
+                    <div id="messages" class="mt-4 lg:mt-0">{% include 'partials/alert.html' %}</div>
+                    <h4 class="border-b py-2 font-bold">سبد خرید</h4>
+                    {% for cartitem in cartitems %}
+                        <!-- desktop -->
+                        <div class="items-center justify-between border-b py-4 hidden lg:flex">
+                            <div>
+                                <button hx-delete="{% url 'carts:cart-view' cartitem.product_variant.id %}"
+                                        hx-target="#basket" hx-swap="outerHTML">
+                                    <img src="{% static 'images/icons/CloseSquare-Linear-32px.svg' %}" alt="remove">
+                                </button>
+                            </div>
+                            <div>
+                                <img src="{{ cartitem.product_variant.variant_image.image.url }}" class="rounded-lg"
+                                     width="200" height="200"
+                                     alt="{{ cartitem.product_variant.variant_image.alt_text }}">
+                            </div>
+                            <div>
+                                <h1 class="font-bold">{{ cartitem.product_variant.product.name }}
+                                    - {{ cartitem.product_variant.variables.all|join:' ,' }}</h1>
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm">{{ cartitem.product_variant.product.get_price_text }}</p>
+                            </div>
+                            <div class="flex relative">
+                                <button type="button" hx-patch="{% url 'carts:cart-view' cartitem.product_variant.id %}"
+                                        hx-target="#basket" hx-swap="outerHTML" hx-vals='{"type": "increase"}'
+                                        class="btn btn-outline btn-xs input-bordered absolute bg-white right-0">+
+                                </button>
+                                <input
+                                        disabled
+                                        name="stock"
+                                        type="text"
+                                        placeholder="تعداد"
+                                        value="{{ cartitem.quantity }}"
+                                        class="input input-bordered input-xs w-24 px-8 text-center"/>
+                                <button {% if cartitem.quantity <= 1 %}disabled{% endif %} type="button"
+                                        hx-patch="{% url 'carts:cart-view' cartitem.product_variant.id %}"
+                                        hx-target="#basket" hx-swap="outerHTML" hx-vals='{"type": "decrease"}'
+                                        class="btn btn-outline input-bordered btn-xs absolute bg-white left-0">-
+                                </button>
+                            </div>
+                        </div>
+                        <!-- mobile -->
+                        <div class="items-center justify-between border-b py-4 flex lg:hidden {% if forloop.last %}mb-4{% endif %}">
+                            <div class="flex gap-4 w-full justify-between">
+                                <div class="flex gap-4">
+                                    <img src="{{ cartitem.product_variant.variant_image.image.url }}" class="rounded-lg"
+                                         width="150" height="150"
+                                         alt="{{ cartitem.product_variant.variant_image.alt_text }}">
+                                    <div class="flex flex-col justify-around text-xs font-bold">
+                                        <p>{{ cartitem.product_variant.product.name }}
+                                            - {{ cartitem.product_variant.variables.all|join:' ,' }}</p>
+                                        <p>تعداد</p>
+                                        <p>قیمت</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col justify-around text-sm font-bold items-end">
+                                    <button hx-delete="{% url 'carts:cart-view' cartitem.product_variant.id %}"
+                                            hx-target="#basket" hx-swap="outerHTML">
+                                        <img src="{% static 'images/icons/CloseSquare-Linear-32px.svg' %}" alt="remove">
+                                    </button>
+                                    <div class="flex relative">
+                                        <button type="button"
+                                                hx-patch="{% url 'carts:cart-view' cartitem.product_variant.id %}"
+                                                hx-target="#basket" hx-swap="outerHTML" hx-vals='{"type": "increase"}'
+                                                class="btn btn-outline btn-xs input-bordered absolute bg-white right-0">
+                                            +
+                                        </button>
+                                        <input
+                                                disabled
+                                                name="stock"
+                                                type="text"
+                                                placeholder="تعداد"
+                                                value="{{ cartitem.quantity }}"
+                                                class="input input-bordered input-xs w-24 px-8 text-center"/>
+                                        <button {% if cartitem.quantity <= 1 %}disabled{% endif %} type="button"
+                                                hx-patch="{% url 'carts:cart-view' cartitem.product_variant.id %}"
+                                                hx-target="#basket" hx-swap="outerHTML" hx-vals='{"type": "decrease"}'
+                                                class="btn btn-outline input-bordered btn-xs absolute bg-white left-0">-
+                                        </button>
+                                    </div>
+                                    <p>{{ cartitem.product_variant.product.get_price_text }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
+                    <div class="border rounded-lg p-4">
+                        <div class="border-b pb-4 mb-4">
+                            <h4 class="font-bold text-sm">کد تخفیف</h4>
+                            <p class="text-xs my-3">کد تخفیف کد معرف کارت هدیه خود را در زیر وارد کرده و دکمه ثبت رو
+                                بزنید تا در صورت داشتن اعتبار به سفارش شما اعمال شود.</p>
+                            <form novalidate class="flex gap-4" hx-post="{% url 'carts:promo-view' %}"
+                                  hx-target="#basket" hx-swap="outerHTML">
+                                {% render_field promo_code_form.code class="input input-bordered w-full" %}
+                                <button type="submit" class="btn btn-outline btn-primary">ثبت</button>
+                            </form>
+                        </div>
+
+                        <div class="flex flex-col gap-4 border-b pb-4 mb-4">
+                            <div class="flex justify-between text-xs font-bold">
+                                <p>قیمت کالا ها</p>
+                                <p>{{ total_price }}</p>
+                            </div>
+
+                            <div class="flex justify-between text-xs font-bold items-center">
+                                <p class="flex flex-row-reverse gap-2 items-center">مجموع تخفیف روی کالا ها <img
+                                        src="{% static 'images/icons/ReceiptDiscount-Linear-32px.svg' %}"
+                                        alt="discount"></p>
+                                <p class="text-error">{{ promo_code_discount }}</p>
+                            </div>
+
+                            <div class="flex justify-between text-xs font-bold">
+                                <p>سود شما از خرید</p>
+                                <p>{{ total_discount }}</p>
+                            </div>
+
+                            <div class="flex justify-between text-xs font-bold">
+                                <p>هزینه ارسال</p>
+                                <p>{{ shipping_cost }}</p>
+                            </div>
+                        </div>
+
+                        <div class="">
+                            <div class="flex justify-between text-base font-bold">
+                                <p>جمع مبلغ پرداخت</p>
+                                <p>{{ purchase_price }}</p>
+                            </div>
+                            <form hx-post="{% url 'orders:create-order' %}" hx-swap="innerHTML" hx-target="#messages">
+                                {% render_field promo_code_form.code type="hidden" class="input input-bordered w-full" %}
+                                <button class="btn mt-4 btn-primary w-full">
+                                    ثبت سفارش
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="border rounded-lg p-4 mb-5">
+                        <ul class="list-disc text-sm p-4 leading-8">
+                            <li>در صورت اتمام موجودی‌، کالاها از سبد خرید حذف میشوند.</li>
+                            <li>لطفا در طول مراحل خرید فیلتر شکن خود را خاموش کنید.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endpartialdef %}
+{% endblock %}

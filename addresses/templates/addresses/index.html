@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load partials %}
+{% load widget_tweaks %}
+
+{% block title %}
+    سبد خرید
+{% endblock %}
+
+{% partialdef address %}
+    <div class="border p-4 rounded-lg flex justify-between items-center {% if address.default %}border-primary{% endif %}">
+        <div>
+            <h1 class="text-sm font-bold mb-4">{{ address.address }}</h1>
+            <div class="flex gap-4 text-sm font-bold">
+                <div>
+                    <p class="flex items-center gap-2"><img src="{% static 'images/icons/location.svg' %}"
+                                                            alt=""><span>{{ address.province }} - {{ address.city }}</span></p>
+                    <p class="flex items-center gap-2"><img src="{% static 'images/icons/sms.svg' %}"
+                                                            alt=""><span>{{ address.postal_code }}</span></p>
+                </div>
+                <div>
+                    <p class="flex items-center gap-2"><img src="{% static 'images/icons/call.svg' %}"
+                                                            alt=""><span>{{ address.phone_number }}</span></p>
+                    <p class="flex items-center gap-2"><img src="{% static 'images/icons/user.svg' %}"
+                                                            alt=""><span>{{ address.full_name }}</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col gap-2">
+            <button class="btn btn-outline btn-sm" onclick="edit_address_{{ address.id }}.showModal()">ویرایش</button>
+            <dialog id="edit_address_{{ address.id }}" class="modal">
+                    <div class="modal-box">
+                        {% partialdef edit-form inline %}
+                            <form id="edit-form-{{ address.id }}" hx-post="{% url "addresses:addresses-update-view" address.id %}" novalidate hx-target="#address-list" hx-swap="outerHTML" class="flex flex-col gap-4">
+                                <div class="flex gap-4">
+                                    <label class="form-control w-full">
+                                        <div class="label">
+                                            <span class="label-text">استان</span>
+                                        </div>
+                                        {% render_field form.province placeholder="استان" class="input input-bordered w-full" value=address.province %}
+                                        {% if form.province.errors %}
+                                              <div class="label">
+                                                <span class="label-text-alt text-xs text-error">{{ form.province.errors }}</span>
+                                              </div>
+                                        {% endif %}
+                                    </label>
+
+                                    <label class="form-control w-full">
+                                        <div class="label">
+                                            <span class="label-text">شهر</span>
+                                        </div>
+                                        {% render_field form.city placeholder="شهر" class="input input-bordered w-full" value=address.city %}
+                                        {% if form.city.errors %}
+                                              <div class="label">
+                                                <span class="label-text-alt text-xs text-error">{{ form.city.errors }}</span>
+                                              </div>
+                                        {% endif %}
+                                    </label>
+                                </div>
+
+                                <div class="flex gap-4">
+                                    <label class="form-control w-full">
+                                        <div class="label">
+                                            <span class="label-text">کد پستی</span>
+                                        </div>
+                                        {% render_field form.postal_code placeholder="کد پستی" class="input input-bordered w-full" value=address.postal_code %}
+                                        {% if form.postal_code.errors %}
+                                              <div class="label">
+                                                <span class="label-text-alt text-xs text-error">{{ form.postal_code.errors }}</span>
+                                              </div>
+                                        {% endif %}
+                                    </label>
+
+                                    <div class="w-full"></div>
+                                </div>
+
+                                <label class="form-control w-full">
+                                    <div class="label">
+                                        <span class="label-text">آدرس</span>
+                                    </div>
+                                    {% render_field form.address class="textarea textarea-bordered" placeholder="آدرس" value=address.address %}
+                                    {% if form.address.errors %}
+                                          <div class="label">
+                                            <span class="label-text-alt text-xs text-error">{{ form.address.errors }}</span>
+                                          </div>
+                                    {% endif %}
+                                </label>
+
+                                <hr/>
+                                <h1 class="font-bold">مشخصات تحویل گیرنده</h1>
+
+                                <div class="flex gap-4">
+                                    <label class="form-control w-full">
+                                        <div class="label">
+                                            <span class="label-text">نام و نام خانوادگی</span>
+                                        </div>
+                                        {% render_field form.full_name placeholder="نام و نام خانوادگی" class="input input-bordered w-full" value=address.full_name %}
+                                        {% if form.full_name.errors %}
+                                            <div class="label">
+                                                <span class="label-text-alt text-xs text-error">{{ form.full_name.errors }}</span>
+                                            </div>
+                                        {% endif %}
+                                    </label>
+
+                                    <label class="form-control w-full">
+                                        <div class="label">
+                                            <span class="label-text">شماره تماس</span>
+                                        </div>
+                                        {% render_field form.phone_number placeholder="شماره تلفن همراه" class="input input-bordered w-full" value=address.phone_number %}
+                                        {% if form.phone_number.errors %}
+                                            <div class="label">
+                                                <span class="label-text-alt text-xs text-error">{{ form.phone_number.errors }}</span>
+                                            </div>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                <p class="text-xs font-bold mt-4 text-end">سفارشات به این آدرس ارسال می‌شوند</p>
+                                <button class="btn btn-primary">تایید</button>
+                            </form>
+                        {% endpartialdef %}
+                    </div>
+                    <form method="dialog" class="modal-backdrop">
+                        <button>بستن</button>
+                    </form>
+                </dialog>
+            <button class="btn btn-outline btn-sm" hx-trigger="click" hx-delete="{% url "addresses:addresses-delete-view" address.id %}" hx-target="#address-list" hx-swap="outerHTML">حذف</button>
+            {% if not address.default %}
+            <button class="btn btn-outline btn-sm" hx-trigger="click" hx-post="{% url "addresses:addresses-default-view" address.id %}" hx-target="#address-list" hx-swap="outerHTML">پیشفرض</button>
+            {% endif %}
+        </div>
+    </div>
+{% endpartialdef %}
+
+{% block content %}
+    <div class="container p-4">
+        <div class="justify-center my-8 hidden lg:flex">
+            <ul class="steps steps-vertical lg:steps-horizontal">
+                <li class="step text-sm font-bold">سبد خرید</li>
+                <li class="step text-sm font-bold step-primary">اطلاعات آدرس</li>
+                <li class="step text-sm font-bold">پرداخت</li>
+            </ul>
+        </div>
+
+        <div class="lg:grid grid-cols-12 gap-10">
+            <div class="col-span-12 lg:col-span-8">
+                <div id="messages" class="mt-4 lg:mt-0"></div>
+                <h4 class="border-b py-2 font-bold mb-4">آدرس ارسال</h4>
+                {% partialdef address-list inline %}
+                    <div class="flex flex-col gap-4" id="address-list">
+                        {% for address in addresses %}
+                            {% partial address %}
+                        {% endfor %}
+                    </div>
+                {% endpartialdef %}
+                <button class="btn btn-outline my-4" onclick="add_address.showModal()">افزودن آدرس</button>
+                <dialog id="add_address" class="modal">
+                    <div class="modal-box">
+                        {% partialdef form inline %}
+                            <form id="add-form" hx-post="{% url "addresses:addresses-view" %}" novalidate hx-target="#address-list" hx-swap="beforeend" hx-on::after-request="this.reset()" class="flex flex-col gap-4">
+                                <div class="flex gap-4">
+                                    <label class="form-control w-full">
+                                        <div class="label">
+                                            <span class="label-text">استان</span>
+                                        </div>
+                                        {% render_field form.province placeholder="استان" class="input input-bordered w-full" %}
+                                        {% if form.province.errors %}
+                                              <div class="label">
+                                                <span class="label-text-alt text-xs text-error">{{ form.province.errors }}</span>
+                                              </div>
+                                        {% endif %}
+                                    </label>
+
+                                    <label class="form-control w-full">
+                                        <div class="label">
+                                            <span class="label-text">شهر</span>
+                                        </div>
+                                        {% render_field form.city placeholder="شهر" class="input input-bordered w-full" %}
+                                        {% if form.city.errors %}
+                                              <div class="label">
+                                                <span class="label-text-alt text-xs text-error">{{ form.city.errors }}</span>
+                                              </div>
+                                        {% endif %}
+                                    </label>
+                                </div>
+
+                                <div class="flex gap-4">
+                                    <label class="form-control w-full">
+                                        <div class="label">
+                                            <span class="label-text">کد پستی</span>
+                                        </div>
+                                        {% render_field form.postal_code placeholder="کد پستی" class="input input-bordered w-full" %}
+                                        {% if form.postal_code.errors %}
+                                              <div class="label">
+                                                <span class="label-text-alt text-xs text-error">{{ form.postal_code.errors }}</span>
+                                              </div>
+                                        {% endif %}
+                                    </label>
+
+                                    <div class="w-full"></div>
+                                </div>
+
+                                <label class="form-control w-full">
+                                    <div class="label">
+                                        <span class="label-text">آدرس</span>
+                                    </div>
+                                    {% render_field form.address placeholder="آدرس" rows="2" cols="5" class="textarea textarea-bordered" %}
+                                    {% if form.address.errors %}
+                                          <div class="label">
+                                            <span class="label-text-alt text-xs text-error">{{ form.address.errors }}</span>
+                                          </div>
+                                    {% endif %}
+                                </label>
+
+                                <hr/>
+                                <h1 class="font-bold">مشخصات تحویل گیرنده</h1>
+
+                                <div class="flex gap-4">
+                                    <label class="form-control w-full">
+                                        <div class="label">
+                                            <span class="label-text">نام و نام خانوادگی</span>
+                                        </div>
+                                        {% render_field form.full_name placeholder="نام و نام خانوادگی" class="input input-bordered w-full" %}
+                                        {% if form.full_name.errors %}
+                                            <div class="label">
+                                                <span class="label-text-alt text-xs text-error">{{ form.full_name.errors }}</span>
+                                            </div>
+                                        {% endif %}
+                                    </label>
+
+                                    <label class="form-control w-full">
+                                        <div class="label">
+                                            <span class="label-text">شماره تماس</span>
+                                        </div>
+                                        {% render_field form.phone_number placeholder="شماره تلفن همراه" class="input input-bordered w-full" %}
+                                        {% if form.phone_number.errors %}
+                                            <div class="label">
+                                                <span class="label-text-alt text-xs text-error">{{ form.phone_number.errors }}</span>
+                                            </div>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                <p class="text-xs font-bold mt-4 text-end">سفارشات به این آدرس ارسال می‌شوند</p>
+                                <button class="btn btn-primary">تایید</button>
+                            </form>
+                        {% endpartialdef %}
+                    </div>
+                    <form method="dialog" class="modal-backdrop">
+                        <button>بستن</button>
+                    </form>
+                </dialog>
+            </div>
+
+            <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
+                <div class="border rounded-lg p-4">
+                    <div class="flex flex-col gap-4">
+                        <div class="flex justify-between text-xs font-bold">
+                            <p>قیمت کالا ها</p>
+                            <p>{{ total_price }}</p>
+                        </div>
+
+                        <div class="flex justify-between text-xs font-bold items-center">
+                            <p class="flex flex-row-reverse gap-2 items-center">مجموع تخفیف روی کالا ها <img
+                                    src="{% static 'images/icons/ReceiptDiscount-Linear-32px.svg' %}" alt="discount"></p>
+                            <p class="text-error">{{ promo_code_discount }}</p>
+                        </div>
+
+                        <div class="flex justify-between text-xs font-bold">
+                            <p>سود شما از خرید</p>
+                            <p>{{ total_discount }}</p>
+                        </div>
+
+                        <div id="shipping-cost">
+                            {% partialdef shipping inline %}
+                            <div class="flex justify-between text-xs font-bold border-b pb-4">
+                                <p>هزینه ارسال</p>
+                                <p>{{ shipping_cost }}</p>
+                            </div>
+
+                            <div class="flex justify-between text-base font-bold mt-4">
+                                <p>جمع مبلغ پرداخت</p>
+                                <p>{{ purchase_price }}</p>
+                            </div>
+                            {% endpartialdef %}
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="form-control">
+                          <label class="label cursor-pointer">
+                            <span class="label-text text-xs">تحویل درب فروشگاه (با این گزینه هزینه ارسال حذف میشود)</span>
+                            <input type="checkbox" class="checkbox" hx-post="{% url 'addresses:addresses-store-delivery-view' %}" hx-target="#shipping-cost" hx-swap="innerHTML" {% if store_delivery %}checked{% endif %}/>
+                          </label>
+                        </div>
+
+                        <button class="btn mt-4 btn-primary w-full" hx-post="{% url 'orders:checkout-view' %}" hx-target="#messages" hx-swap="innerHTML">
+                            پرداخت
+                        </button>
+                    </div>
+                </div>
+
+                <div class="border rounded-lg p-4 mb-5">
+                    <ul class="list-disc text-sm p-4 leading-8">
+                        <li>در صورت اتمام موجودی‌، کالاها از سبد خرید حذف میشوند.</li>
+                        <li>لطفا در طول مراحل خرید فیلتر شکن خود را خاموش کنید.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

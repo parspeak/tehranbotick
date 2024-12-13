@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load partials %}
+{% load widget_tweaks %}
+
+{% block title %}
+پرداخت شما با موفقیت انجام شد
+{% endblock %}
+
+{% block content %}
+    {% partialdef basket inline %}
+        <div class="w-[600px] p-8 bg-[#c300004e] mx-auto rounded-lg my-10 flex items-center justify-center flex-col">
+            <img src="{% static 'images/icons/info-circle.png' %}" alt="">
+            <h1 class="text-center font-bold text-2xl text-[#C30000] opacity-100 mt-8">{{ message }}</h1>
+        </div>
+    {% endpartialdef %}
+{% endblock %}

@@ -1,0 +1,211 @@
+{% load static %}
+
+<footer>
+    <div class="bg-secondary">
+        <div class="container grid grid-cols-5 py-8 px-4 lg:px-0">
+            <div class="col-span-5 lg:col-span-2">
+                <form action="">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="text-sm font-bold text-white">برای دریافت آخرین اخبار و تخفیف های
+                                جدید،ایمیل خود را وارد نمایید</span>
+                        </label>
+                        <div class="flex gap-4">
+                            <input id="email" name="email" type="email" placeholder="ایمیل شما"
+                                class="input input-bordered w-full" />
+                            <button class="btn bg-primary text-white" disabled type="submit">ثبت</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="p-4 lg:col-span-1 lg:p-0"></div>
+
+            <div class="col-span-5 lg:col-span-2 flex flex-col justify-center items-center gap-4">
+                <h3 class="text-white font-light text-sm">ما را در شبکه های اجتماعی دنبال کنید</h3>
+                <ul class="flex gap-8">
+                    <li><a href="https://www.instagram.com/tehranbotick/"><img src="{% static 'images/icons/instagram.svg' %}" alt=""></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="bg-primary hidden lg:block">
+        <div class="container py-8">
+            <div class="grid grid-cols-5">
+                <div class="col-span-1">
+                    <div class="max-w-28 mb-6">
+                        <h2 class="font-bold text-white text-sm text-nowrap">صفحات سایت</h2>
+                        <div class="border"></div>
+                    </div>
+                    <div>
+                        <ul class="text-white text-sm leading-9">
+                            <li><a href="/store/">فروشگاه</a></li>
+                            <li><a href="{% url 'accounts:user-profile-detail' %}">حساب کاربری</a></li>
+                            <li><a href="{% url 'carts:list-cart-view' %}">سبد خرید</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="max-w-28 mb-6">
+                        <h2 class="font-bold text-white text-sm text-nowrap">خدمات مشتریان</h2>
+                        <div class="border"></div>
+                    </div>
+                    <div>
+                        <ul class="text-white text-sm leading-9">
+                            <li><a href="#">فروش محصولات</a></li>
+                            <li><a href="#">فرصت همکاری</a></li>
+                            <li><a href="#">تماس با ما</a></li>
+                            <li><a href="#">نقشه سایت</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="w-min mb-6">
+                        <h2 class="font-bold text-white text-sm text-nowrap">راهنمای خرید</h2>
+                        <div class="border"></div>
+                    </div>
+                    <div>
+                        <ul class="text-white text-sm leading-9">
+                            <li><a href="#">فروش محصولات</a></li>
+                            <li><a href="#">فرصت همکاری</a></li>
+                            <li><a href="#">تماس با ما</a></li>
+                            <li><a href="#">نقشه سایت</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-span-2">
+                    <h1 class="text-white font-bold text-lg text-right">فروشگاه اینترنتی تهران بوتیک</h1>
+                    <p class="text-white text-sm font-light mt-4 text-right"><strong>آدرس: </strong>تهران، خاوران، خیابان مسجدالحسین(ع)، بزرگراه امام رضا(ع)، پاساژ خورشید، طبقه: همکف، واحد: 60</p>
+
+                    <div class="flex gap-4 text-white text-sm font-light mt-4 text-right">
+                        <p>
+                            <span>تماس پشتیبانی: </span>
+                            <span>02133460069</span>
+                        </p>
+
+                        <p>
+                            <span>پاسخگویی: </span>
+                            <span>24 ساعته 7 روز هفته</span>
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="bg-primary">
+        <div class="container text-white text-xs font-light py-4">
+            <p>تمام حقوق این وبسایت متعلق به فروشگاه آنلاین تهران بوتیک می باشد</p>
+        </div>
+    </div>
+
+    <section class="bg-primary fixed bottom-0 left-0 right-0 py-2 z-50 rounded-t-xl lg:hidden">
+        <div class="container flex justify-between px-8">
+            <a class="flex justify-center items-center flex-col gap-1" href="{% url 'home' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M12 18v-3M10.07 2.82 3.14 8.37c-.78.62-1.28 1.93-1.11 2.91l1.33 7.96c.24 1.42 1.6 2.57 3.04 2.57h11.2c1.43 0 2.8-1.16 3.04-2.57l1.33-7.96c.16-.98-.34-2.29-1.11-2.91l-6.93-5.54c-1.07-.86-2.8-.86-3.86-.01Z"
+                        stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+                <h6 class="text-white text-sm font-bold">خانه</h6>
+            </a>
+
+            <button class="flex justify-center items-center flex-col gap-1" onclick="category_modal.showModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 7h18M3 12h18M3 17h18" stroke="#fff" stroke-width="1.5" stroke-linecap="round"></path>
+                </svg>
+                <h6 class="text-white text-sm font-bold">دسته بندی ها</h6>
+            </button>
+            <dialog id="category_modal" class="modal bg-white">
+                <div class="absolute top-0 left-0 right-0 p-4">
+                    <div class="flex mb-8 gap-2 items-center">
+                        <button onclick="category_modal.close()">
+                            <img src="{% static 'images/icons/arrow-right.svg' %}" alt="arrow-right">
+                        </button>
+                        <h3 class="text-sm font-bold">دسته بندی ها</h3>
+                    </div>
+
+                    <div class="join join-vertical w-full">
+                        {% for category in categories %}
+                            <div class="collapse collapse-arrow join-item border-base-300 border">
+                                <input type="radio" name="my-accordion-4"{% if forloop.first %}
+                                	checked="checked"
+                                {% endif %} />
+                            <div class="collapse-title text-xl font-bold">{{ category.name }}</div>
+                            <div class="collapse-content">
+                                <ul class="ms-2 text-sm font-semibold leading-9">
+                                    {% for sub_category in category.subcategories.all %}
+                                        <li class="flex items-center gap-2">
+                                            <img src="{% static 'images/icons/arrow-left.svg' %}" alt="">
+                                            <a href="/store/?category={{ sub_category.id }}">{{ sub_category.name }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </dialog>
+
+            <button class="flex justify-center items-center flex-col gap-1" onclick="search_modal.showModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M11.5 21a9.5 9.5 0 1 0 0-19 9.5 9.5 0 0 0 0 19ZM22 22l-2-2" stroke="#fff"
+                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+                <h6 class="text-white text-sm font-bold">جستجو</h6>
+            </button>
+            <dialog id="search_modal" class="modal bg-white">
+                <div class="absolute top-0 left-0 right-0 p-4">
+                    <div class="flex mb-8 gap-2 items-center">
+                        <button onclick="search_modal.close()">
+                            <img src="{% static 'images/icons/arrow-right.svg' %}" alt="arrow-right">
+                        </button>
+                        <h3 class="text-sm font-bold">جستجو</h3>
+                    </div>
+
+                    <div>
+                        <form action="" class="relative mb-4">
+                            <div>
+                                <img src="{% static 'images/icons/search-normal.svg' %}" alt="search-icon"
+                                    class="absolute left-2 top-3">
+
+                                    <input
+                                        name="q"
+                                        id="search"
+                                        type="text"
+                                        placeholder="جستجو"
+                                        hx-get="/search/"
+                                        hx-trigger="keyup changed delay:500ms"
+                                        hx-target="#mobile-search-result"
+                                       class="input input-bordered w-full placeholder:text-primary text-sm"
+                                    />
+                            </div>
+                        </form>
+                        <div id="mobile-search-result"></div>
+                    </div>
+                </div>
+            </dialog>
+
+            <a class="flex justify-center items-center flex-col gap-1" href="{% url 'carts:list-cart-view' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M2 2h1.74c1.08 0 1.93.93 1.84 2l-.83 9.96a2.796 2.796 0 0 0 2.79 3.03h10.65c1.44 0 2.7-1.18 2.81-2.61l.54-7.5c.12-1.66-1.14-3.01-2.81-3.01H5.82M16.25 22a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5ZM8.25 22a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5ZM9 8h12"
+                        stroke="#fff" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"
+                        stroke-linejoin="round"></path>
+                </svg>
+                <h6 class="text-white text-sm font-bold">سبد خرید</h6>
+            </a>
+
+            <a class="flex justify-center items-center flex-col gap-1" href="{% url 'accounts:user-profile-detail' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M12.16 10.87c-.1-.01-.22-.01-.33 0a4.42 4.42 0 0 1-4.27-4.43C7.56 3.99 9.54 2 12 2a4.435 4.435 0 0 1 .16 8.87ZM7.16 14.56c-2.42 1.62-2.42 4.26 0 5.87 2.75 1.84 7.26 1.84 10.01 0 2.42-1.62 2.42-4.26 0-5.87-2.74-1.83-7.25-1.83-10.01 0Z"
+                        stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+                <h6 class="text-white text-sm font-bold">پروفایل</h6>
+            </a>
+        </div>
+    </section>
+</footer>

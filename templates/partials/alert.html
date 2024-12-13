@@ -1,0 +1,7 @@
+{% if messages %}
+    {% for message in messages %}
+    <div role="alert" {% if message.tags %} class="alert alert-{{ message.tags }} text-white text-sm my-4"{% endif %} x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)" x-transition:leave.duration.400ms>
+        <span>{{ message }}</span>
+    </div>
+    {% endfor %}
+{% endif %}

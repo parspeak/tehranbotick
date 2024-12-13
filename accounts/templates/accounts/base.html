@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa-IR" data-theme="light" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{% static 'js/htmx.js' %}"></script>
+    <script defer src="{% static 'js/alpine.js' %}"></script>
+    {% block extra_head %}{% endblock extra_head %}
+    <link rel="stylesheet" href="{% static "css/main.css" %}">
+    <title>{% block title %}{% endblock title %}</title>
+</head>
+    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+        {% block content %}{% endblock %}
+        {% block extra_script %}{% endblock %}
+    </body>
+</html>

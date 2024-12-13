@@ -1,0 +1,89 @@
+{% extends 'accounts/profile-base.html' %}
+{% load static %}
+{% load partials %}
+{% load widget_tweaks %}
+{% load humanize %}
+
+{% block title %}
+    تهران بوتیک - پروفایل کاربری
+{% endblock %}
+
+{% block profile-content %}
+    <section x-data="{ activeTab:  0 }"
+             class="flex flex-col w-full justify-center py-6 px-4 rounded-xl lg:px-9 lg:w-2/3 lg:border">
+        <strong class="text-2xl">تاریخچه سفارشات</strong>
+        <div class="flex items-center w-full border-b mt-6">
+            <button @click="activeTab = 0" :class="{'border-b border-primary text-primary': activeTab === 0 }"
+                    class="flex px-5 justify-center items-center gap-1 pb-2 hover:border-b hover:border-primary hover:text-primary">
+                تکمیل شده
+            </button>
+            <button @click="activeTab = 1" :class="{'border-b border-primary text-primary': activeTab === 1 }"
+                    class="flex px-5 justify-center items-center gap-1 pb-2 hover:border-b hover:border-primary hover:text-primary">
+                لغو شده
+            </button>
+        </div>
+        <div x-show.transition.in.opacity.duration.600="activeTab === 0">
+            {% for order in complete_orders %}
+                <div class="border rounded-lg mt-5 p-4">
+                <div class="flex items-center gap-6 mt-4 text-sm">
+                    <p class="text-base-content/40">{{ order.created_at }}</p>
+                    <p class="text-base-content/40 hidden md:block">کد سفارس <span class="text-base-content">{{ order.alias }}</span></p>
+                    <p class="text-base-content/40">مبلغ <span class="text-base-content">{{ order.total_price|intcomma }} تومان</span></p>
+                </div>
+                <hr class="h-px my-5">
+                <div class="flex items-center gap-4">
+                    {% for cart_item in order.cart_items.all %}
+                        <img src="{{ cart_item.product_variant.variant_image.image.url }}" width="100" alt="product" class="object-contain rounded-xl">
+                    {% endfor %}
+                    
+                </div>
+                <hr class="h-px my-5">
+                <div>
+                    {% if order.store_delivery %}
+                            <h1 class="text-md font-bold">محل تحویل</h1>
+                            <p class="text-sm mt-2 ms-2 text-success">درب فروشگاه</p>
+                        {% else %}
+                            <h1 class="text-md font-bold">آدرس حمل و نقل</h1>
+                            <p class="text-sm mt-2 ms-2"><strong>استان:</strong> {{ order.address.province }}</p>
+                            <p class="text-sm mt-2 ms-2"><strong>شهر:</strong> {{ order.address.city }}</p>
+                            <p class="text-sm mt-2 ms-2"><strong>آدرس:</strong> {{ order.address.address }}</p>
+                            <p class="text-sm mt-2 ms-2"><strong>کد پستی:</strong> {{ order.address.postal_code }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div x-show.transition.in.opacity.duration.600="activeTab === 1">
+            {% for order in canceled_orders %}
+                <div class="border rounded-lg mt-5 p-4">
+                <div class="flex items-center gap-6 mt-4 text-sm">
+                    <p class="text-base-content/40">{{ order.created_at }}</p>
+                    <p class="text-base-content/40 hidden md:block">کد سفارس <span class="text-base-content">{{ order.alias }}</span></p>
+                    <p class="text-base-content/40">مبلغ <span class="text-base-content">{{ order.total_price|intcomma }} تومان</span></p>
+                </div>
+                <hr class="h-px my-5">
+                <div class="flex items-center gap-4">
+                    {% for cart_item in order.cart_items.all %}
+                        <img src="{{ cart_item.product_variant.variant_image.image.url }}" width="100" alt="product" class="object-contain rounded-xl">
+                    {% endfor %}
+
+                </div>
+                <hr class="h-px my-5">
+                <div>
+                    {% if order.store_delivery %}
+                            <h1 class="text-md font-bold">محل تحویل</h1>
+                            <p class="text-sm mt-2 ms-2 text-success">درب فروشگاه</p>
+                        {% else %}
+                            <h1 class="text-md font-bold">آدرس حمل و نقل</h1>
+                            <p class="text-sm mt-2 ms-2"><strong>استان:</strong> {{ order.address.province }}</p>
+                            <p class="text-sm mt-2 ms-2"><strong>شهر:</strong> {{ order.address.city }}</p>
+                            <p class="text-sm mt-2 ms-2"><strong>آدرس:</strong> {{ order.address.address }}</p>
+                            <p class="text-sm mt-2 ms-2"><strong>کد پستی:</strong> {{ order.address.postal_code }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}
+

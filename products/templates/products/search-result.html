@@ -1,0 +1,20 @@
+<div class="bg-white w-full rounded-b-2xl border-t p-4 flex flex-col gap-4">
+    <h1 class="text-sm font-bold">نتایج جستجو</h1>
+    {% if products %}
+        {% for product in products %}
+            <a href="{% url 'products:product-detail' product.id %}">
+                <div class="border p-2 rounded-md grid grid-cols-12 gap-2">
+                    <div class="col-span-2">
+                        <img class="rounded" src="{{ product.thumbnail.image.url }}" alt="">
+                    </div>
+                    <div class="col-span-10">
+                        <h1 class="font-bold">{{ product.name }}</h1>
+                        <p class="text-sm mt-2">{{ product.get_price_text }}</p>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+        {% else %}
+        <p class="text-center text-sm font-bold">نتیجه ای یافت نشد.</p>
+    {% endif %}
+</div>

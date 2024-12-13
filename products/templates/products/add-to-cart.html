@@ -1,0 +1,28 @@
+<div id="add-to-cart" class="mt-8">
+    <div class="text-left mb-8">
+        <p class="font-extrabold text-xl">
+            {% if is_discounted %}
+                <del class="text-red-500 me-2">{{ price }}</del>
+                {{ discounted_price }}
+                {% else %}
+                {{ price }}
+            {% endif %}
+        </p>
+    </div>
+
+    <form class="flex justify-end gap-4 items-center" hx-post="{% url 'carts:cart-view' variant_id %}" hx-swap="innerHTML" hx-target="#messages">
+        <select name="stock" class="select select-primary" {% if not stock %}disabled{% endif %}>
+            <option disabled selected>تعداد</option>
+            {% for number in stock %}
+                <option>{{ number }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary" {% if not stock %}disabled{% endif %}>
+            {% if not stock %}
+                موجود نیست
+                {% else %}
+                افزودن به سبد خرید
+            {% endif %}
+        </button>
+    </form>
+</div>

@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load partials %}
+
+{% block title %}
+    تهران بوتیک - {{ product.name }}
+{% endblock %}
+
+{% block extra_head %}
+    <meta name="format-detection" content="telephone=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="تهران بوتیک">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="تهران بوتیک">
+    <meta property="og:title" content="{{ product.meta_title }}">
+    <meta property="og:description" content="{{ product.meta_description }}">
+    <meta property="og:image" content="{{ product.thumbnail.image.url }}">
+    <meta property="og:image:alt" content="{{ product.meta_title }}">
+    <meta name="description" content="{{ product.meta_description }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container grid grid-cols-12 lg:gap-8 p-2 lg:py-4">
+        <div class="col-span-12 lg:col-span-4 space-y-2 block" dir="ltr">
+            <div style="--swiper-navigation-color: #fff; --swiper-pagination-color: #fff"
+                 class="swiper gallery rounded-lg relative">
+                <div class="swiper-wrapper">
+                    {% for image in gallery_images %}
+                        <div class="swiper-slide">
+                            <img class="rounded-lg" src="{{ image }}" alt=""/>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+            <div class="swiper thumbs">
+                <div class="swiper-wrapper">
+                    {% for image in gallery_images %}
+                        <div class="swiper-slide opacity-50">
+                            <img class="rounded-lg" src="{{ image }}" alt=""/>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-span-12 lg:col-span-8" x-data="onVariant()">
+            <div id="messages" class="mt-4 lg:mt-0"></div>
+            <div class="border-b py-4 mb-4">
+                <h1 class="font-extrabold text-2xl text-primary">{{ product.name }}</h1>
+            </div>
+
+            <div class="leading-8 mb-4">
+                {{ product.description|safe }}
+            </div>
+            <form class="flex gap-4" hx-post="{% url 'products:choice-variant-view' product.id %}" hx-trigger="change"
+                  hx-target="#add-to-cart" hx-swap="outerHTML">
+                {% for variant in variants %}
+                    <select name="{{ variant.type }}" class="select select-primary"
+                            @change="onChange($event.target.value, '{{ variant.type }}')">
+                        <option disabled selected>{{ variant.text }}</option>
+                        {% for item in variant.items %}
+                            <option value="{{ forloop.counter0 }}|{{ item.variables__id }}">{{ item.variables__name }}</option>
+                        {% endfor %}
+                    </select>
+                {% endfor %}
+            </form>
+
+            <div id="add-to-cart" class="mt-8">
+                <div class="text-left mb-4">
+                    <p class="font-extrabold text-xl">
+                        {% if product.is_discounted %}
+                            <del class="text-red-500 me-2">{{ product.get_price_text }}</del>
+                            {{ product.get_discounted_price }}
+                            {% else %}
+                            {{ product.get_price_text }}
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="flex justify-end gap-4">
+                    <button class="btn btn-primary" disabled>
+                        افزودن به سبد
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if product.related_to.all %}
+        <div class="container mt-8">
+        <div class="flex items-center">
+            <div class="flex gap-2 items-center text-nowrap me-10">
+                <h3 class="font-extrabold text-lg">محصولات مرتبط</h3>
+            </div>
+            <hr class="w-full"/>
+            <a class="btn btn-ghost btn-sm ms-4 text-primary" href="{% url 'products:store-view' %}">مشاهده بیشتر</a>
+        </div>
+        <div class="swiper product-carousel my-6">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    {% for foo in product.related_to.all %}
+                        <a href="{% url 'products:product-detail' product.id %}">
+                            <div class="col-span-3 border rounded-lg p-2">
+                                <img class="object-cover max-h-72 w-full rounded-md"
+                                     src="{{ product.thumbnail.image.url }}"
+                                     alt="{{ product.thumbnail.alt_text }}">
+                                <div class="mt-2">
+                                    <h1 class="font-extrabold text-lg">{{ product.name }}</h1>
+                                    <p class="text-sm font-bold mt-1">{{ product.summary }}</p>
+                                    <p class="text-end font-extrabold">{{ product.get_price_text }}</p>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="swiper-button-next text-primary w-10 h-10 bg-white/80 rounded-full"></div>
+            <div class="swiper-button-prev text-primary w-10 h-10 bg-white/80 rounded-full"></div>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block extra_script %}
+    <script>
+        const gallery = new Swiper(".gallery", {
+            spaceBetween: 10,
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            thumbs: {
+                swiper: new Swiper(".thumbs", {
+                    loop: false,
+                    spaceBetween: 10,
+                    watchSlidesProgress: true,
+                    breakpoints: {
+                        0: {
+                            direction: 'horizontal',
+                            slidesPerView: 3,
+                        },
+                        768: {
+                            direction: 'horizontal',
+                            slidesPerView: 4,
+                        },
+                        1024: {
+                            direction: 'horizontal',
+                            slidesPerView: 5,
+                        },
+                    }
+                })
+            },
+        });
+    </script>
+
+    <script>
+        function onVariant() {
+            return {
+                variants: {},
+                onChange: (value, type) => {
+                    if (type === 'LAYOUT' || type === 'COLOR') {
+                        gallery.slideTo(value.split('|')[0]);
+                        console.log(value.split('|')[0])
+                    }
+                    this.variants = {...this.variants, [type]: value.split('|')[1]}
+                }
+            }
+        }
+    </script>
+    <script>
+        new Swiper(".product-carousel", {
+            slidesPerView: 4,
+            spaceBetween: 24,
+            grid: {},
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            breakpoints: {
+                0: {
+                    slidesPerView: 2,
+                    spaceBetween: 24,
+                },
+                1024: {
+                    slidesPerView: 5,
+                    spaceBetween: 24,
+                },
+            },
+        });
+    </script>
+{% endblock %}

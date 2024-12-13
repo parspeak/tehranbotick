@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load partials %}
+{% load widget_tweaks %}
+
+{% block title %}
+پرداخت شما با موفقیت انجام شد
+{% endblock %}
+
+{% block content %}
+    {% partialdef basket inline %}
+        <div class="w-[600px] p-8 bg-[#00ba886e] mx-auto rounded-lg my-10 flex items-center justify-center flex-col">
+            <img src="{% static 'images/icons/tick-square.png' %}" alt="">
+            <h1 class="text-center font-bold text-2xl text-[#00966D] opacity-100 mt-8">پرداخت شما با موفقیت انجام شد</h1>
+            <p class="mt-4">شما میتوانید از طریق پروفایل کاربری لیست سفارشات خود را ببینید.</p>
+        </div>
+    {% endpartialdef %}
+{% endblock %}

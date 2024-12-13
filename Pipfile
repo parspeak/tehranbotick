@@ -1,0 +1,29 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "*"
+djangorestframework = "*"
+markdown = "*"
+django-filter = "*"
+djangorestframework-simplejwt = "*"
+pillow = "*"
+django-colorfield = "*"
+django-cors-headers = "*"
+tzdata = "*"
+django-widget-tweaks = "*"
+django-template-partials = "*"
+pytz = "*"
+django-htmx = "*"
+az-iranian-bank-gateways = "*"
+celery = {extras = ["redis"], version = "*"}
+django-celery-beat = "*"
+django-celery-results = "*"
+weasyprint = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"

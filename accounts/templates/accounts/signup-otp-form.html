@@ -1,0 +1,70 @@
+{% load widget_tweaks %}
+{% load partials %}
+
+{% partialdef verify_otp_form inline %}
+    <form x-data="otpForm()" hx-post="{% url 'accounts:user-signup-verify-view' %}" hx-swap="outerHTML" hx-target="closest form">
+        <div class="flex justify-between gap-2" x-ref="otpInputContainer" dir="ltr">
+            <template x-for="(input, index) in length" :key="index">
+                <input
+                        type="tel"
+                        maxlength="1"
+                        class="otpInput w-14 h-14 text-center text-2xl font-bold input input-bordered"
+                        @input="handleInput($event, index)"
+                        @paste="handlePaste($event)"
+                        @keydown.backspace="$event.target.value || handleBackspace($event, index)"
+                />
+            </template>
+        </div>
+        {% if form.otp.errors %}
+            <div class="label">
+                <span class="label-text-alt text-red-500">{{ form.otp.errors }}</span>
+                <span class="label-text-alt"></span>
+            </div>
+        {% endif %}
+
+        {% render_field form.phone_number type="hidden" %}
+        {% render_field form.otp x-model="value" type="hidden" %}
+        <button type="submit" class="btn btn-primary w-full my-3" :disabled="value.length !== length">ثبت نام کن</button>
+    </form>
+{% endpartialdef %}
+<script>
+    function otpForm() {
+        return {
+            length: 5,
+            value: "",
+
+            get inputs() {
+                return this.$refs.otpInputContainer.querySelectorAll('.otpInput');
+            },
+
+            handleInput(e, index) {
+                const inputValues = [...this.inputs].map(input => input.value);
+                this.value = inputValues.join('');
+                if (e.target.value) {
+                    const nextInput = this.inputs[index + 1];
+                    if (nextInput) {
+                        nextInput.focus();
+                        nextInput.select();
+                    }
+                }
+            },
+
+            handlePaste(e) {
+                const paste = e.clipboardData.getData('text').slice(0, this.length);
+                paste.split('').forEach((char, i) => {
+                    if (this.inputs[i]) {
+                        this.inputs[i].value = char;
+                    }
+                });
+                this.value = [...this.inputs].map(input => input.value).join('');
+            },
+
+            handleBackspace(e, index) {
+                if (index > 0) {
+                    this.inputs[index - 1].focus();
+                    this.inputs[index - 1].select();
+                }
+            },
+        };
+    }
+</script>

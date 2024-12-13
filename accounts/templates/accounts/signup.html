@@ -1,0 +1,73 @@
+{% extends 'accounts/base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% load partials %}
+
+{% block title %}
+    تهران بوتیک - ثبت نام در فروشگاه
+{% endblock %}
+
+{% block content %}
+    <main class="flex justify-center items-center gap-20 py-8 md:py-0 md:h-screen" hx-history-elt="true">
+        <section class="flex flex-col items-end">
+            <div class="w-[20rem]">
+                <div class="flex flex-col items-center justify-center text-center">
+                    <h1 class="hidden mb-24 text-xl font-bold md:block">به تهران بوتیک خوش آمدید</h1>
+                    <img src="{% static 'images/site/logo.png' %}" alt="logo" width="200" class="mb-20 md:hidden">
+                    <h2 class="mb-8 font-bold">ثبت نام</h2>
+                </div>
+                {% partialdef signup_form inline %}
+                    <form novalidate="novalidate" hx-post="{% url 'accounts:user-signup-view' %}" hx-swap="outerHTML"
+                          hx-target="closest form">
+                        <label class="form-control w-full mb-2">
+                            <span class="label-text mb-2">نام</span>
+                            {% render_field form.first_name|add_error_class:"input-error" placeholder="نام" class="input input-bordered w-full" %}
+                            {% if form.first_name.errors %}
+                                <div class="label">
+                                    <span class="label-text-alt text-xs text-error">{{ form.first_name.errors }}</span>
+                                </div>
+                            {% endif %}
+                        </label>
+
+                        <label class="form-control w-full mb-2">
+                            <span class="label-text mb-2">نام خانوادگی</span>
+                            {% render_field form.last_name|add_error_class:"input-error" placeholder="نام خانوادگی" class="input input-bordered w-full" %}
+                            {% if form.last_name.errors %}
+                                <div class="label">
+                                    <span class="label-text-alt text-xs text-error">{{ form.last_name.errors }}</span>
+                                </div>
+                            {% endif %}
+                        </label>
+
+                        <label class="form-control w-full mb-2">
+                            <span class="label-text mb-2">شماره تلفن</span>
+                            {% render_field form.phone_number|add_error_class:"input-error" placeholder="شماره تلفن" class="input input-bordered w-full" %}
+                            {% if form.phone_number.errors %}
+                                <div class="label">
+                                    <span class="label-text-alt text-xs text-error">{{ form.phone_number.errors }}</span>
+                                </div>
+                            {% endif %}
+                        </label>
+
+                        <label class="form-control w-full mb-2">
+                            <span class="label-text mb-2">کلمه عبور</span>
+                            {% render_field form.password|add_error_class:"input-error" placeholder="کلمه عبور" class="input input-bordered w-full" %}
+                            {% if form.phone_number.errors %}
+                                <div class="label">
+                                    <span class="label-text-alt text-xs text-error">{{ form.password.errors }}</span>
+                                </div>
+                            {% endif %}
+                        </label>
+                        <p class="text-xs text-clip my-5">ورود و عضویت شما به منزله پذیرفتن قوانین و مقررات می باشد.</p>
+                        <button type="submit" class="btn btn-primary w-full mb-3">ارسال کد تایید</button>
+                    </form>
+                {% endpartialdef %}
+            </div>
+            <a href="{% url 'accounts:user-login-view' %}" class="link-primary w-full text-center mt-5">ورود و ثبت نام</a>
+        </section>
+
+        <section class="hidden md:block">
+            <img src="{% static 'images/site/photo.png' %}" alt="login banner">
+        </section>
+    </main>
+{% endblock %}

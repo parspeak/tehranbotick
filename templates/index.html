@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    تهران بوتیک - فروشگاه اینترنتی
+{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/swiper.css' %}"/>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container mt-4 lg:mt-8 px-4 lg:px-0">
+        <div class="swiper banner-slider rounded-xl z-0">
+            <div class="swiper-wrapper ">
+                <div class="swiper-slide">
+                    <img class="rounded-xl" src="{% static 'images/site/banner-1.jpg' %}" alt="">
+                </div>
+                <div class="swiper-slide">
+                    <img class="rounded-xl" src="{% static 'images/site/banner-2.jpg' %}" alt="">
+                </div>
+            </div>
+            <div class="swiper-button-next text-primary w-10 h-10 bg-white/80 rounded-full"></div>
+            <div class="swiper-button-prev text-primary w-10 h-10 bg-white/80 rounded-full"></div>
+        </div>
+    </div>
+    <!-- categories -->
+    {#    <div class="container mt-4 lg:mt-8 px-4 lg:px-0">#}
+    {#        <div class="flex items-center">#}
+    {#            <div class="flex gap-2 items-center text-nowrap me-10">#}
+    {#                <img src="{% static 'images/icons/medal-star.svg' %}" alt="medal-star">#}
+    {#                <h3 class="font-extrabold text-lg">دسته بندی محصولات</h3>#}
+    {#            </div>#}
+    {#            <hr class="w-full" />#}
+    {#            <a class="btn btn-ghost btn-sm ms-4 text-primary" href="">مشاهده بیشتر</a>#}
+    {#        </div>#}
+    {#        <div class="swiper product-carousel my-6">#}
+    {#            <div class="swiper-wrapper">#}
+    {#                {% for category in categories %}#}
+    {#                        {% if category.thumbnail %}#}
+    {#                            <a class="swiper-slide border rounded-lg p-2" href="">#}
+    {#                                    <img class="object-cover max-h-32 w-full rounded-md" src="{{ category.thumbnail.image.url }}"#}
+    {#                                        alt="{{ category.slug }}">#}
+    {#                                <h2 class="pt-2 text-center font-bold text-sm">{{ category.name }}</h2>#}
+    {#                            </a>#}
+    {#                        {% endif %}#}
+    {##}
+    {#                {% endfor %}#}
+    {#            </div>#}
+    {#            <div class="swiper-button-next text-primary w-10 h-10 bg-white/80 rounded-full"></div>#}
+    {#            <div class="swiper-button-prev text-primary w-10 h-10 bg-white/80 rounded-full"></div>#}
+    {#        </div>#}
+    {#    </div>#}
+
+    <!-- products -->
+    <div class="container mt-4 lg:mt-8 px-4 lg:px-0">
+        <div class="flex items-center">
+            <div class="flex gap-2 items-center text-nowrap me-10">
+                <img src="{% static 'images/icons/medal-star.svg' %}" alt="medal-star">
+                <h3 class="font-extrabold text-lg">جدیدترین ها</h3>
+            </div>
+            <hr class="w-full"/>
+            <a class="btn btn-ghost btn-sm ms-4 text-primary" href="{% url 'products:store-view' %}">مشاهده بیشتر</a>
+        </div>
+
+        <div class="grid grid-cols-12 gap-6 my-6">
+
+            {% for product in products %}
+                <a class="col-span-6 lg:col-span-3 border rounded-lg p-2 relative"
+                   href="{% url 'products:product-detail' product.id %}">
+                    {% if not product.in_stock %}
+                        <p class="absolute right-4 top-4 bg-primary p-2 rounded-xl text-sm z-10 text-white">ناموجود</p>
+                    {% endif %}
+                    <img class="object-cover max-h-72 w-full rounded-md {% if not product.in_stock %}grayscale{% endif %}"
+                         src="{{ product.thumbnail.image.url }}"
+                         alt="{{ product.thumbnail.alt_text }}">
+                    <div class="mt-2">
+                        <h1 class="font-extrabold text-lg">{{ product.name }}</h1>
+                        <p class="text-sm font-bold mt-1">{{ product.summary }}</p>
+                        <p class="text-end font-extrabold">
+                            {% if product.is_discounted %}
+                                <del class="text-red-500 me-2">{{ product.get_price_text }}</del>
+                                {{ product.get_discounted_price }}
+                            {% else %}
+                                {{ product.get_price_text }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="container grid grid-cols-12 gap-4 mt-4 lg:mt-8 px-4 lg:px-0">
+        <div class="col-span-6 lg:col-span-3">
+            <a href="{% url 'products:store-view' %}?category=4">
+                <img class="rounded-lg" src="{% static 'images/site/normal.jpg' %}" alt="">
+            </a>
+        </div>
+
+        <div class="col-span-6 lg:col-span-3">
+            <a href="{% url 'products:store-view' %}?category=3">
+                <img class="rounded-lg" src="{% static 'images/site/normal3.jpg' %}" alt="">
+            </a>
+        </div>
+
+        <div class="col-span-6 lg:col-span-3">
+            <a href="{% url 'products:store-view' %}?status=instock">
+                <img class="rounded-lg" src="{% static 'images/site/normal4.jpg' %}" alt="">
+            </a>
+        </div>
+
+        <div class="col-span-6 lg:col-span-3">
+            <a href="{% url 'products:store-view' %}?status=onsale">
+                <img class="rounded-lg" src="{% static 'images/site/normal5.jpg' %}" alt="">
+            </a>
+        </div>
+    </div>
+
+    <!-- products carousel -->
+    {% if discounted_products|length > 0 %}
+        <div class="container mt-4 lg:mt-8 px-4 lg:px-0">
+            <div class="flex items-center">
+                <div class="flex gap-2 items-center text-nowrap me-10">
+                    <img src="{% static 'images/icons/medal-star.svg' %}" alt="medal-star">
+                    <h3 class="font-extrabold text-lg">حراجی ها</h3>
+                </div>
+                <hr class="w-full"/>
+                <a class="btn btn-ghost btn-sm ms-4 text-primary" href="{% url 'products:store-view' %}?status=onsale">مشاهده
+                    بیشتر</a>
+            </div>
+            <div class="swiper product-carousel my-6">
+                <div class="swiper-wrapper">
+                    {% for product in discounted_products %}
+                        <a class="swiper-slide" href="{% url 'products:product-detail' product.id %}">
+                            <div class="col-span-3 border rounded-lg p-2 relative">
+                                {% if not product.in_stock %}
+                                    <p class="absolute right-4 top-4 bg-primary p-2 rounded-xl text-sm z-10 text-white">
+                                        ناموجود</p>
+                                {% endif %}
+                                <img class="object-cover max-h-72 w-full rounded-md {% if not product.in_stock %}grayscale{% endif %}"
+                                     src="{{ product.thumbnail.image.url }}"
+                                     alt="{{ product.thumbnail.alt_text }}">
+                                <div class="mt-2">
+                                    <h1 class="font-extrabold text-lg">{{ product.name }}</h1>
+                                    <p class="text-sm font-bold mt-1">{{ product.summary }}</p>
+                                    <p class="text-end font-extrabold">
+                                        {% if product.is_discounted %}
+                                            <del class="text-red-500 me-2">{{ product.get_price_text }}</del>
+                                            {{ product.get_discounted_price }}
+                                        {% else %}
+                                            {{ product.get_price_text }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+                <div class="swiper-button-next text-primary w-10 h-10 bg-white/80 rounded-full"></div>
+                <div class="swiper-button-prev text-primary w-10 h-10 bg-white/80 rounded-full"></div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="container mt-4 lg:mt-8 px-4 lg:px-0">
+        <div class="flex items-center">
+            <div class="flex gap-2 items-center text-nowrap me-10">
+                <img src="{% static 'images/icons/medal-star.svg' %}" alt="medal-star">
+                <h3 class="font-extrabold text-lg">بافت ها</h3>
+            </div>
+            <hr class="w-full"/>
+            <a class="btn btn-ghost btn-sm ms-4 text-primary" href="{% url 'products:store-view' %}?category=2">مشاهده
+                بیشتر</a>
+        </div>
+        <div class="swiper product-carousel my-6">
+            <div class="swiper-wrapper">
+                {% for product in categories_0 %}
+                    <a class="swiper-slide" href="{% url 'products:product-detail' product.id %}">
+                        <div class="col-span-3 border rounded-lg p-2 relative">
+                            {% if not product.in_stock %}
+                                <p class="absolute right-4 top-4 bg-primary p-2 rounded-xl text-sm z-10 text-white">
+                                    ناموجود</p>
+                            {% endif %}
+                            <img class="object-cover max-h-72 w-full rounded-md {% if not product.in_stock %}grayscale{% endif %}"
+                                 src="{{ product.thumbnail.image.url }}"
+                                 alt="{{ product.thumbnail.alt_text }}">
+                            <div class="mt-2">
+                                <h1 class="font-extrabold text-lg">{{ product.name }}</h1>
+                                <p class="text-sm font-bold mt-1">{{ product.summary }}</p>
+                                <p class="text-end font-extrabold">
+                                    {% if product.is_discounted %}
+                                        <del class="text-red-500 me-2">{{ product.get_price_text }}</del>
+                                        {{ product.get_discounted_price }}
+                                    {% else %}
+                                        {{ product.get_price_text }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+            <div class="swiper-button-next text-primary w-10 h-10 bg-white/80 rounded-full"></div>
+            <div class="swiper-button-prev text-primary w-10 h-10 bg-white/80 rounded-full"></div>
+        </div>
+    </div>
+
+    <div class="container mt-4 lg:mt-8 px-4 lg:px-0">
+        <div class="flex items-center">
+            <div class="flex gap-2 items-center text-nowrap me-10">
+                <img src="{% static 'images/icons/medal-star.svg' %}" alt="medal-star">
+                <h3 class="font-extrabold text-lg">ست ها</h3>
+            </div>
+            <hr class="w-full"/>
+            <a class="btn btn-ghost btn-sm ms-4 text-primary" href="{% url 'products:store-view' %}?category=3">مشاهده
+                بیشتر</a>
+        </div>
+        <div class="swiper product-carousel my-6">
+            <div class="swiper-wrapper">
+                {% for product in categories_1 %}
+                    <a class="swiper-slide" href="{% url 'products:product-detail' product.id %}">
+                        <div class="col-span-3 border rounded-lg p-2 relative">
+                            {% if not product.in_stock %}
+                                <p class="absolute right-4 top-4 bg-primary p-2 rounded-xl text-sm z-10 text-white">
+                                    ناموجود</p>
+                            {% endif %}
+                            <img class="object-cover max-h-72 w-full rounded-md {% if not product.in_stock %}grayscale{% endif %}"
+                                 src="{{ product.thumbnail.image.url }}"
+                                 alt="{{ product.thumbnail.alt_text }}">
+                            <div class="mt-2">
+                                <h1 class="font-extrabold text-lg">{{ product.name }}</h1>
+                                <p class="text-sm font-bold mt-1">{{ product.summary }}</p>
+                                <p class="text-end font-extrabold">
+                                    {% if product.is_discounted %}
+                                        <del class="text-red-500 me-2">{{ product.get_price_text }}</del>
+                                        {{ product.get_discounted_price }}
+                                    {% else %}
+                                        {{ product.get_price_text }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+            <div class="swiper-button-next text-primary w-10 h-10 bg-white/80 rounded-full"></div>
+            <div class="swiper-button-prev text-primary w-10 h-10 bg-white/80 rounded-full"></div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_script %}
+    <script>
+        new Swiper(".product-carousel", {
+            slidesPerView: 4,
+            spaceBetween: 24,
+            grid: {},
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            breakpoints: {
+                0: {
+                    slidesPerView: 2,
+                    spaceBetween: 24,
+                },
+                1024: {
+                    slidesPerView: 5,
+                    spaceBetween: 24,
+                },
+            },
+        });
+    </script>
+
+    <script>
+        new Swiper(".banner-slider", {
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            spaceBetween: 8,
+            autoplay: {
+                delay: 5000,
+            },
+        });
+    </script>
+{% endblock %}

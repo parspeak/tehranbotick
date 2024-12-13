@@ -1,0 +1,106 @@
+{% load static %}
+
+<nav x-data="{showOverlay: false}">
+    <div class="absolute w-full h-full bg-black/30 z-10" x-transition.opacity x-show="showOverlay"
+         @click="showOverlay = false" x-cloak></div>
+    <div class="min-h-10 w-full bg-primary text-white flex items-center justify-center">
+        <h4 class="text-xs">به وبسایت تهران بوتیک خوش امدید.</h4>
+    </div>
+    <div class="border-b z-20 relative bg-white px-4 lg:px-0">
+        <div class="container min-h-[105px] justify-items-center lg:justify-items-stretch grid grid-cols-12 items-center">
+
+            <div class="col-span-12 lg:col-span-4 flex justify-between items-center w-full">
+                <a class="col-span-12 lg:col-span-4" href="{% url 'home' %}">
+                    <img src="{% static 'images/site/logo.png' %}" alt="logo" width="100" height="50">
+                </a>
+
+                {% if user.is_authenticated %}
+                    <a class="btn btn-ghost text-sm lg:hidden" href="{% url 'accounts:user-profile-detail' %}">
+                        <img src="{% static 'images/icons/user.svg' %}" alt="login-icon">
+                        پروفایل کاربری
+                    </a>
+                {% else %}
+                    <a class="btn btn-ghost text-sm lg:hidden" href="{% url 'accounts:user-login-view' %}">
+                        <img src="{% static 'images/icons/login.svg' %}" alt="login-icon">
+                        ورود | ثبت نام
+                    </a>
+                {% endif %}
+            </div>
+            <div class="col-span-4 relative hidden lg:block">
+                <form action="">
+                    <div>
+                        <img src="{% static 'images/icons/search-normal.svg' %}" alt="search-icon"
+                             class="absolute left-2 top-3">
+
+                        <input
+                            name="q"
+                            id="search"
+                            type="text"
+                            placeholder="جستجو"
+                            hx-get="/search/"
+                            hx-trigger="keyup changed delay:500ms"
+                            hx-target="#search-result"
+                           class="input input-bordered  w-full  placeholder:text-primary text-sm"
+                           :class="showOverlay && 'border-none'" @focus="showOverlay = !showOverlay"
+                        />
+                    </div>
+                </form>
+                <div id="search-result" class="absolute w-full" x-show="showOverlay" x-cloak x-transition:enter></div>
+            </div>
+
+            <div class="col-span-4 justify-end gap-2 hidden lg:flex">
+                {% if user.is_authenticated %}
+                    <a class="btn btn-ghost text-sm" href="{% url 'accounts:user-profile-detail' %}">
+                        <img src="{% static 'images/icons/user.svg' %}" alt="login-icon">
+                        پروفایل کاربری
+                    </a>
+                {% else %}
+                    <a class="btn btn-ghost text-sm" href="{% url 'accounts:user-login-view' %}">
+                        <img src="{% static 'images/icons/login.svg' %}" alt="login-icon">
+                        ورود | ثبت نام
+                    </a>
+                {% endif %} 
+
+
+                <a class="btn btn-ghost text-sm" href="{% url 'carts:list-cart-view' %}">
+                    <img src="{% static 'images/icons/shopping-cart.svg' %}" alt="login-icon">
+                    سبد خرید
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="border-b hidden lg:block">
+        <div class="container">
+            <div class="relative" x-data="{showMenu: false}">
+                <div class="flex items-center w-36 gap-2 border-x justify-center cursor-pointer"
+                     @click="showMenu = !showMenu">
+                    <img src="{% static 'images/icons/menu.svg' %}" alt="menu-icon">
+                    <div class="flex items-center justify-between space-x-5">
+                        <a class="menu-hover py-4 text-sm font-bold text-black">
+                            دسته بندی ها
+                        </a>
+                    </div>
+                </div>
+
+                <div class="absolute z-30 rounded-b-xl flex w-full flex-col bg-white border" x-show="showMenu"
+                     @mouseleave="showMenu = false" x-cloak="" x-transition:enter @click.outside="showMenu = false">
+                    <div class="grid grid-cols-12">
+                        {% for category in categories %}
+                            <div class="col-span-2 border-e p-4">
+                                <a href="/store/?category={{ category.id }}" class="font-bold text-lg mb-2">{{ category.name }}</a>
+                                <ul class="ms-2 text-sm font-semibold leading-9">
+                                    {% for sub_category in category.subcategories.all %}
+                                        <li class="flex items-center gap-2">
+                                            <img src="{% static 'images/icons/arrow-left.svg' %}" alt="">
+                                            <a href="/store/?category={{ sub_category.id }}">{{ sub_category.name }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
